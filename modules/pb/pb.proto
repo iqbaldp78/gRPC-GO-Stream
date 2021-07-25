@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "grpc-go/modules/pb";
+
+// Push request. Adds a number to aggregate Number to push 
+message PushReq { 
+    float num = 1;
+}
+
+// Empty message
+message Empty {} 
+
+// Creates a stream of notifications when running average exceeds the threshold provided message
+message GetAvgAlarmStreamReq {
+   // When average of pushed numbers exceeds this threshold, a notification will be sent to the response stream 
+   float threshold = 1;
+} 
+
+// Notification message sent to the stream when average aggregate is greater than the threshold
+message GetAvgAlarmStreamRes { 
+    // Current average value that was compared to the threshold
+    float avg = 1;
+}
+
+service AvgAlarmService { 
+    // Push a number to aggregate Returns an error when average exceeds float range
+    rpc Push(PushReq) returns (Empty) {}
+    // Gets a stream of notifications when current average exceeds the threshold provided in request
+    // Never returns an error
+    rpc GetAvgAlarmStream(GetAvgAlarmStreamReq) returns (stream GetAvgAlarmStreamRes) {}
+} 
